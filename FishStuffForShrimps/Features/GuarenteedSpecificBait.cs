@@ -72,6 +72,23 @@ public sealed partial class ModEntry
         {
             CodeMatcher matcher = new(instructions, generator);
 
+            // IL_01a1: ldloc.s 11
+            // IL_01a3: ldloc.1
+            // IL_01a4: ldfld class [System.Collections]System.Collections.Generic.List`1<class [StardewValley.GameData]StardewValley.GameData.Locations.SpawnFishData> [StardewValley.GameData]StardewValley.GameData.Locations.LocationData::Fish
+            // IL_01a9: call class [System.Runtime]System.Collections.Generic.IEnumerable`1<!!0> [System.Linq]System.Linq.Enumerable::Concat<class [StardewValley.GameData]StardewValley.GameData.Locations.SpawnFishData>(class [System.Runtime]System.Collections.Generic.IEnumerable`1<!!0>, class [System.Runtime]System.Collections.Generic.IEnumerable`1<!!0>)
+            // IL_01ae: stloc.s 11
+            matcher
+                .MatchStartForward([
+                    new(inst => inst.IsLdloc()),
+                    new(inst => inst.IsLdloc()),
+                    new(OpCodes.Ldfld, AccessTools.DeclaredField(typeof(LocationData), nameof(LocationData.Fish))),
+                    new(OpCodes.Call),
+                    new(inst => inst.IsStloc()),
+                ])
+                .ThrowIfNotMatch("Failed to match 'enumerable = enumerable.Concat(locationData.Fish);");
+
+            CodeInstruction ldlocFishEnumerate = matcher.Instruction.Clone();
+
             // IL_0415: ldloc.s 22
             // IL_0417: ldfld class [StardewValley.GameData]StardewValley.GameData.Locations.SpawnFishData StardewValley.GameLocation/'<>c__DisplayClass502_1'::spawn
             // IL_041c: callvirt instance string [StardewValley.GameData]StardewValley.GameData.GenericSpawnItemData::get_ItemId()
@@ -92,32 +109,35 @@ public sealed partial class ModEntry
 
             CodeInstruction ldlocTargetedFish = matcher.InstructionAt(-1).Clone();
 
-            // IL_0258: ldloc.s 22
-            // IL_025a: ldfld class [StardewValley.GameData]StardewValley.GameData.Locations.SpawnFishData StardewValley.GameLocation/'<>c__DisplayClass502_1'::spawn
-            // IL_025f: callvirt instance string [StardewValley.GameData]StardewValley.GameData.Locations.SpawnFishData::get_FishAreaId()
-            // IL_0264: brfalse.s IL_027e
+            // IL_0201: brtrue.s IL_0206
+            // IL_0203: ldnull
+            // IL_0204: br.s IL_020b
+            // IL_0206: ldsfld class [System.Collections]System.Collections.Generic.HashSet`1<string> StardewValley.GameStateQuery::MagicBaitIgnoreQueryKeys
+            // IL_020b: stloc.s 13
+
             matcher
-                .MatchStartBackwards([
-                    new(inst => inst.IsLdloc()),
-                    new(OpCodes.Ldfld),
+                .MatchEndBackwards([
+                    new(OpCodes.Brtrue_S),
+                    new(OpCodes.Ldnull),
+                    new(OpCodes.Br_S),
                     new(
-                        OpCodes.Callvirt,
-                        AccessTools.DeclaredPropertyGetter(typeof(SpawnFishData), nameof(SpawnFishData.FishAreaId))
+                        OpCodes.Ldsfld,
+                        AccessTools.DeclaredField(
+                            typeof(GameStateQuery),
+                            nameof(GameStateQuery.MagicBaitIgnoreQueryKeys)
+                        )
                     ),
-                    new(OpCodes.Brfalse_S),
+                    new(inst => inst.IsStloc()),
                 ])
-                .ThrowIfNotMatch("Failed to match 'foreach (spawn.FishAreaId != null)'");
-
-            CodeInstruction ldlocIterDisplay = matcher.InstructionAt(0).Clone();
-            CodeInstruction ldfldIterSpawn = matcher.InstructionAt(1).Clone();
-
+                .ThrowIfNotMatch(
+                    "Failed to match 'HashSet<string> ignoreQueryKeys = (flag ? GameStateQuery.MagicBaitIgnoreQueryKeys : null);"
+                );
             matcher
-                .Advance(2)
+                .Advance(1)
                 .Insert([
+                    ldlocFishEnumerate,
                     ldlocTargetedFish,
                     new(OpCodes.Call, AccessTools.DeclaredMethod(typeof(ModEntry), nameof(RecordSpawnFishData))),
-                    ldlocIterDisplay,
-                    ldfldIterSpawn,
                 ]);
 
             return matcher.Instructions();
@@ -132,13 +152,12 @@ public sealed partial class ModEntry
     private static string? recordedTargetedFish = null;
     private static List<SpawnFishData>? recordedSpawnFishData = null;
 
-    public static void RecordSpawnFishData(SpawnFishData spawn, string targetedFish)
+    public static void RecordSpawnFishData(IEnumerable<SpawnFishData> spawns, string targetedFish)
     {
-        recordedTargetedFish = targetedFish;
         if (targetedFish == null)
             return;
-        recordedSpawnFishData ??= [];
-        recordedSpawnFishData.Add(spawn);
+        recordedTargetedFish = targetedFish;
+        recordedSpawnFishData = spawns.ToList();
     }
 
     private static void GameLocation_GetFishFromLocationData_Postfix(
@@ -169,9 +188,7 @@ public sealed partial class ModEntry
             return;
         }
 
-        Log(
-            $"Try to force fish: {targetedFish} from SpawnFishData: {string.Join(',', spawnFishData.Select(spawn => spawn.Id ?? "MYSTERY"))}"
-        );
+        Log($"Try to force fish: {targetedFish} from {spawnFishData.Count} SpawnFishData");
 
         if (spawnFishData.Count == 0)
         {
@@ -199,6 +216,7 @@ public sealed partial class ModEntry
                 continue;
             if (spawn.Condition != null && !GameStateQuery.CheckConditions(spawn.Condition))
                 continue;
+            Log($"Trying '{spawn.Id}'");
             foreach (
                 ItemQueryResult result in ItemQueryResolver.TryResolve(
                     spawn,
