@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using HarmonyLib;
 using StardewModdingAPI;
+using StardewModdingAPI.Events;
 
 namespace FishStuffForShrimps;
 
@@ -14,8 +15,8 @@ public sealed partial class ModEntry : Mod
 
     public const string ModId = "mushymato.FishStuffForShrimps";
     private static IMonitor mon = null!;
-    private static ModConfig config = null!;
-    private readonly Harmony harmony = new(ModId);
+    internal static ModConfig config = null!;
+    internal static readonly Harmony harmony = new(ModId);
 
     public override void Entry(IModHelper helper)
     {
@@ -23,8 +24,15 @@ public sealed partial class ModEntry : Mod
         mon = Monitor;
         config = helper.ReadConfig<ModConfig>();
 
-        BobblerBarFishIcon_Patch(harmony);
-        GuarenteedSpecificBait_Patch(harmony);
+        helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+
+        BobblerBarFishIcon_Toggle();
+        GuarenteedSpecificBait_Toggle();
+    }
+
+    private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
+    {
+        config.Register(Helper, ModManifest);
     }
 
     /// <summary>SMAPI static monitor Log wrapper</summary>
