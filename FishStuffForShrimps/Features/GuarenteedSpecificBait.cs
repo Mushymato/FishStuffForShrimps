@@ -213,12 +213,6 @@ public sealed partial class ModEntry
             return;
         }
 
-        string formatItemId(string query) =>
-            query
-                .Replace("BOBBER_X", ((int)bobberTile.X).ToString())
-                .Replace("BOBBER_Y", ((int)bobberTile.Y).ToString())
-                .Replace("WATER_DEPTH", waterDepth.ToString());
-
         location ??= Game1.getLocationFromName(locationName);
         itemQueryContext ??= new ItemQueryContext(
             location ?? Game1.getLocationFromName(locationName),
@@ -257,6 +251,13 @@ public sealed partial class ModEntry
         Log($"Failed to get '{targetedFish}'");
         return;
 
+
+        string formatItemId(string query) =>
+            query
+                .Replace("BOBBER_X", ((int)bobberTile.X).ToString())
+                .Replace("BOBBER_Y", ((int)bobberTile.Y).ToString())
+                .Replace("WATER_DEPTH", waterDepth.ToString());
+
         bool TryResolveForTarget(
             ItemQueryContext itemQueryContext,
             ref Item __result,
@@ -279,6 +280,10 @@ public sealed partial class ModEntry
                 {
                     Log($"Successfully got '{targetedFish}'");
                     __result = fishItem;
+                    if (!string.IsNullOrWhiteSpace(spawn.SetFlagOnCatch))
+                        __result.SetFlagOnPickup = spawn.SetFlagOnCatch;
+                    if (spawn.IsBossFish)
+                        __result.SetTempData("IsBossFish", value: true);
                     return false;
                 }
             }
