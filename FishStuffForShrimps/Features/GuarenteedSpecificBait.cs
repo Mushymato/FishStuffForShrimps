@@ -1,4 +1,6 @@
+using System.Reflection;
 using System.Reflection.Emit;
+using Force.DeepCloner;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
@@ -8,46 +10,52 @@ using StardewValley.Internal;
 
 namespace FishStuffForShrimps;
 
-public partial class ModConfig
-{
-    public bool Enable_GuarenteedSpecificBait { get; set; } = true;
-}
-
 public sealed partial class ModEntry
 {
-    public static void GuarenteedSpecificBait_Patch(Harmony patcher)
+    private static MethodInfo GameLocation_GetFishFromLocationData = AccessTools.DeclaredMethod(
+        typeof(GameLocation),
+        nameof(GameLocation.GetFishFromLocationData),
+        [
+            typeof(string),
+            typeof(Vector2),
+            typeof(int),
+            typeof(Farmer),
+            typeof(bool),
+            typeof(bool),
+            typeof(GameLocation),
+            typeof(ItemQueryContext),
+        ]
+    );
+    private static MethodInfo SpawnFishData_GetChance = AccessTools.DeclaredMethod(
+        typeof(SpawnFishData),
+        nameof(SpawnFishData.GetChance)
+    );
+
+    public static void GuarenteedSpecificBait_Toggle()
     {
         if (!config.Enable_GuarenteedSpecificBait)
         {
-            Log("GuarenteedSpecificBait: Disabled");
+            GuarenteedSpecificBait_Unpatch();
             return;
         }
-        Log("GuarenteedSpecificBait: Enabled");
+        GuarenteedSpecificBait_Patch();
+    }
+
+    private static void GuarenteedSpecificBait_Patch()
+    {
+        Log("GuarenteedSpecificBait: Enabled", LogLevel.Info);
         try
         {
-            patcher.Patch(
-                original: AccessTools.DeclaredMethod(
-                    typeof(GameLocation),
-                    nameof(GameLocation.GetFishFromLocationData),
-                    [
-                        typeof(string),
-                        typeof(Vector2),
-                        typeof(int),
-                        typeof(Farmer),
-                        typeof(bool),
-                        typeof(bool),
-                        typeof(GameLocation),
-                        typeof(ItemQueryContext),
-                    ]
-                ),
+            harmony.Patch(
+                original: GameLocation_GetFishFromLocationData,
                 transpiler: new HarmonyMethod(
                     typeof(ModEntry),
                     nameof(GameLocation_GetFishFromLocationData_Transpiler)
                 ),
                 postfix: new HarmonyMethod(typeof(ModEntry), nameof(GameLocation_GetFishFromLocationData_Postfix))
             );
-            patcher.Patch(
-                original: AccessTools.DeclaredMethod(typeof(SpawnFishData), nameof(SpawnFishData.GetChance)),
+            harmony.Patch(
+                original: SpawnFishData_GetChance,
                 postfix: new HarmonyMethod(typeof(ModEntry), nameof(SpawnFishData_GetChance_Postfix))
             );
         }
@@ -55,6 +63,14 @@ public sealed partial class ModEntry
         {
             Log($"Failed to patch ActualFishInsteadOfIcon:\n{err}", LogLevel.Error);
         }
+    }
+
+    private static void GuarenteedSpecificBait_Unpatch()
+    {
+        Log("GuarenteedSpecificBait: Disabled", LogLevel.Info);
+        harmony.Unpatch(GameLocation_GetFishFromLocationData, HarmonyPatchType.Transpiler, ModId);
+        harmony.Unpatch(GameLocation_GetFishFromLocationData, HarmonyPatchType.Postfix, ModId);
+        harmony.Unpatch(SpawnFishData_GetChance, HarmonyPatchType.Postfix, ModId);
     }
 
     private static void SpawnFishData_GetChance_Postfix(bool isTargetedWithBait, ref float __result)
@@ -188,7 +204,9 @@ public sealed partial class ModEntry
             return;
         }
 
-        Log($"Try to force fish: {targetedFish} from {spawnFishData.Count} SpawnFishData");
+        Log(
+            $"Original fish {__result.QualifiedItemId}, try to force fish: {targetedFish} from {spawnFishData.Count} SpawnFishData"
+        );
 
         if (spawnFishData.Count == 0)
         {
@@ -217,6 +235,35 @@ public sealed partial class ModEntry
             if (spawn.Condition != null && !GameStateQuery.CheckConditions(spawn.Condition))
                 continue;
             Log($"Trying '{spawn.Id}'");
+            if (spawn.RandomItemId?.Any() ?? false)
+            {
+                SpawnFishData tmpSpawn = spawn.ShallowClone();
+                tmpSpawn.RandomItemId = null;
+                foreach (string itemId in spawn.RandomItemId)
+                {
+                    tmpSpawn.ItemId = itemId;
+                    if (TryResolveForTarget(itemQueryContext, ref __result, targetedFish, tmpSpawn))
+                    {
+                        return;
+                    }
+                }
+            }
+            else if (TryResolveForTarget(itemQueryContext, ref __result, targetedFish, spawn))
+            {
+                return;
+            }
+        }
+
+        Log($"Failed to get '{targetedFish}'");
+        return;
+
+        bool TryResolveForTarget(
+            ItemQueryContext itemQueryContext,
+            ref Item __result,
+            string targetedFish,
+            SpawnFishData spawn
+        )
+        {
             foreach (
                 ItemQueryResult result in ItemQueryResolver.TryResolve(
                     spawn,
@@ -232,12 +279,10 @@ public sealed partial class ModEntry
                 {
                     Log($"Successfully got '{targetedFish}'");
                     __result = fishItem;
-                    return;
+                    return false;
                 }
             }
+            return true;
         }
-
-        Log($"Failed to get '{targetedFish}'");
-        return;
     }
 }

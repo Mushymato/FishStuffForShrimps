@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
@@ -9,33 +10,40 @@ using StardewValley.Menus;
 
 namespace FishStuffForShrimps;
 
-public partial class ModConfig
-{
-    public bool Enable_BobberBarFishIcon { get; set; } = true;
-    public bool UncaughtFishSilhouette { get; set; } = true;
-}
-
 public sealed partial class ModEntry : Mod
 {
-    public static void BobblerBarFishIcon_Patch(Harmony patcher)
+    private static MethodInfo BobberBar_draw = AccessTools.DeclaredMethod(typeof(BobberBar), nameof(BobberBar.draw));
+
+    public static void BobblerBarFishIcon_Toggle()
     {
         if (!config.Enable_BobberBarFishIcon)
         {
-            Log("BobberBarFishIcon: Disabled");
+            BobblerBarFishIcon_Unpatch();
             return;
         }
-        Log("BobberBarFishIcon: Enabled");
+        BobblerBarFishIcon_Patch();
+    }
+
+    private static void BobblerBarFishIcon_Patch()
+    {
+        Log("BobberBarFishIcon: Enabled", LogLevel.Info);
         try
         {
-            patcher.Patch(
-                original: AccessTools.DeclaredMethod(typeof(BobberBar), nameof(BobberBar.draw)),
+            harmony.Patch(
+                original: BobberBar_draw,
                 transpiler: new HarmonyMethod(typeof(ModEntry), nameof(BobberBar_draw_Transpiler))
             );
         }
         catch (Exception err)
         {
-            Log($"Failed to patch ActualFishInsteadOfIcon:\n{err}", LogLevel.Error);
+            Log($"Failed to patch BobblerBarFishIcon:\n{err}", LogLevel.Error);
         }
+    }
+
+    private static void BobblerBarFishIcon_Unpatch()
+    {
+        Log("BobberBarFishIcon: Disabled", LogLevel.Info);
+        harmony.Unpatch(BobberBar_draw, HarmonyPatchType.Transpiler, ModId);
     }
 
     private static IEnumerable<CodeInstruction> BobberBar_draw_Transpiler(

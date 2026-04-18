@@ -1,3 +1,6 @@
 {
   "$schema": "https://smapi.io/schemas/i18n.json",
+  "config.Enable_BobberBarFishIcon": "Enable: Bobber Bar Fish Icon",
+  "config.UncaughtFishSilhouette": "Show Silhouette for Uncaught Fish",
+  "config.Enable_GuarenteedSpecificBait": "Guarenteed Specific Bait"
 }
