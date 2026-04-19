@@ -1,4 +1,6 @@
+using FishStuffForShrimps.Features;
 using FishStuffForShrimps.Integration;
+using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 
 namespace FishStuffForShrimps;
@@ -31,10 +33,10 @@ public sealed class ModConfig
             () => Enable_BobberBarFishIcon,
             (value) =>
             {
-                bool shouldToggle = Enable_BobberBarFishIcon != value;
+                bool checkBefore = Enable_BobberBarFishIcon;
                 Enable_BobberBarFishIcon = value;
-                if (shouldToggle)
-                    ModEntry.BobblerBarFishIcon_Toggle();
+                if (checkBefore != Enable_BobberBarFishIcon)
+                    BobberBarFishIcon.Toggle();
             },
             I18n.Config_EnableBobberBarFishIcon_Name,
             I18n.Config_EnableBobberBarFishIcon_Desc
@@ -51,10 +53,10 @@ public sealed class ModConfig
             () => Enable_GuarenteedSpecificBait,
             (value) =>
             {
-                bool shouldToggle = Enable_GuarenteedSpecificBait != value;
+                bool checkBefore = Enable_GuarenteedSpecificBait;
                 Enable_GuarenteedSpecificBait = value;
-                if (shouldToggle)
-                    ModEntry.GuarenteedSpecificBait_Toggle();
+                if (checkBefore != Enable_GuarenteedSpecificBait)
+                    GuarenteedSpecificBait.Toggle();
             },
             I18n.Config_EnableGuarenteedSpecificBait_Name,
             I18n.Config_EnableGuarenteedSpecificBait_Desc

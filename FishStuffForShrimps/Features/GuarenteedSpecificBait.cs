@@ -8,11 +8,11 @@ using StardewValley;
 using StardewValley.GameData.Locations;
 using StardewValley.Internal;
 
-namespace FishStuffForShrimps;
+namespace FishStuffForShrimps.Features;
 
-public sealed partial class ModEntry
+public static class GuarenteedSpecificBait
 {
-    private static MethodInfo GameLocation_GetFishFromLocationData = AccessTools.DeclaredMethod(
+    private static readonly MethodInfo GameLocation_GetFishFromLocationData = AccessTools.DeclaredMethod(
         typeof(GameLocation),
         nameof(GameLocation.GetFishFromLocationData),
         [
@@ -31,46 +31,49 @@ public sealed partial class ModEntry
         nameof(SpawnFishData.GetChance)
     );
 
-    public static void GuarenteedSpecificBait_Toggle()
+    public static void Toggle()
     {
-        if (!config.Enable_GuarenteedSpecificBait)
+        if (!ModEntry.config.Enable_GuarenteedSpecificBait)
         {
-            GuarenteedSpecificBait_Unpatch();
+            Unpatch();
             return;
         }
-        GuarenteedSpecificBait_Patch();
+        Patch();
     }
 
-    private static void GuarenteedSpecificBait_Patch()
+    private static void Patch()
     {
-        Log("GuarenteedSpecificBait: Enabled", LogLevel.Info);
+        ModEntry.Log($"{nameof(GuarenteedSpecificBait)}: Enabled", LogLevel.Info);
         try
         {
-            harmony.Patch(
+            ModEntry.harmony.Patch(
                 original: GameLocation_GetFishFromLocationData,
                 transpiler: new HarmonyMethod(
-                    typeof(ModEntry),
+                    typeof(GuarenteedSpecificBait),
                     nameof(GameLocation_GetFishFromLocationData_Transpiler)
                 ),
-                postfix: new HarmonyMethod(typeof(ModEntry), nameof(GameLocation_GetFishFromLocationData_Postfix))
+                postfix: new HarmonyMethod(
+                    typeof(GuarenteedSpecificBait),
+                    nameof(GameLocation_GetFishFromLocationData_Postfix)
+                )
             );
-            harmony.Patch(
+            ModEntry.harmony.Patch(
                 original: SpawnFishData_GetChance,
-                postfix: new HarmonyMethod(typeof(ModEntry), nameof(SpawnFishData_GetChance_Postfix))
+                postfix: new HarmonyMethod(typeof(GuarenteedSpecificBait), nameof(SpawnFishData_GetChance_Postfix))
             );
         }
         catch (Exception err)
         {
-            Log($"Failed to patch ActualFishInsteadOfIcon:\n{err}", LogLevel.Error);
+            ModEntry.Log($"Failed to patch GuarenteedSpecificBait:\n{err}", LogLevel.Error);
         }
     }
 
-    private static void GuarenteedSpecificBait_Unpatch()
+    private static void Unpatch()
     {
-        Log("GuarenteedSpecificBait: Disabled", LogLevel.Info);
-        harmony.Unpatch(GameLocation_GetFishFromLocationData, HarmonyPatchType.Transpiler, ModId);
-        harmony.Unpatch(GameLocation_GetFishFromLocationData, HarmonyPatchType.Postfix, ModId);
-        harmony.Unpatch(SpawnFishData_GetChance, HarmonyPatchType.Postfix, ModId);
+        ModEntry.Log($"{nameof(GuarenteedSpecificBait)}: Disabled", LogLevel.Info);
+        ModEntry.harmony.Unpatch(GameLocation_GetFishFromLocationData, HarmonyPatchType.Transpiler, ModEntry.ModId);
+        ModEntry.harmony.Unpatch(GameLocation_GetFishFromLocationData, HarmonyPatchType.Postfix, ModEntry.ModId);
+        ModEntry.harmony.Unpatch(SpawnFishData_GetChance, HarmonyPatchType.Postfix, ModEntry.ModId);
     }
 
     private static void SpawnFishData_GetChance_Postfix(bool isTargetedWithBait, ref float __result)
@@ -153,14 +156,17 @@ public sealed partial class ModEntry
                 .Insert([
                     ldlocFishEnumerate,
                     ldlocTargetedFish,
-                    new(OpCodes.Call, AccessTools.DeclaredMethod(typeof(ModEntry), nameof(RecordSpawnFishData))),
+                    new(
+                        OpCodes.Call,
+                        AccessTools.DeclaredMethod(typeof(GuarenteedSpecificBait), nameof(RecordSpawnFishData))
+                    ),
                 ]);
 
             return matcher.Instructions();
         }
         catch (Exception err)
         {
-            Log($"Error in BobberBar_draw_Transpiler:\n{err}", LogLevel.Error);
+            ModEntry.Log($"Error in GameLocation_GetFishFromLocationData_Transpiler:\n{err}", LogLevel.Error);
             return instructions;
         }
     }
@@ -200,11 +206,11 @@ public sealed partial class ModEntry
 
         if (__result.QualifiedItemId == targetedFish)
         {
-            Log($"Already got target fish '{targetedFish}'");
+            ModEntry.Log($"Already got target fish '{targetedFish}'");
             return;
         }
 
-        Log(
+        ModEntry.Log(
             $"Original fish {__result.QualifiedItemId}, try to force fish: {targetedFish} from {spawnFishData.Count} SpawnFishData"
         );
 
@@ -228,7 +234,7 @@ public sealed partial class ModEntry
                 continue;
             if (spawn.Condition != null && !GameStateQuery.CheckConditions(spawn.Condition))
                 continue;
-            Log($"Trying '{spawn.Id}'");
+            ModEntry.Log($"Trying '{spawn.Id}'");
             if (spawn.RandomItemId?.Any() ?? false)
             {
                 SpawnFishData tmpSpawn = spawn.ShallowClone();
@@ -248,7 +254,7 @@ public sealed partial class ModEntry
             }
         }
 
-        Log($"Failed to get '{targetedFish}'");
+        ModEntry.Log($"Failed to get '{targetedFish}'");
         return;
 
         string formatItemId(string query) =>
@@ -277,7 +283,7 @@ public sealed partial class ModEntry
             {
                 if (result.Item is Item fishItem && fishItem.QualifiedItemId == targetedFish)
                 {
-                    Log($"Successfully got '{targetedFish}'");
+                    ModEntry.Log($"Successfully got '{targetedFish}'");
                     __result = fishItem;
                     if (!string.IsNullOrWhiteSpace(spawn.SetFlagOnCatch))
                         __result.SetFlagOnPickup = spawn.SetFlagOnCatch;

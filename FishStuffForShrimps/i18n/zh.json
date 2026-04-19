@@ -1,0 +1,9 @@
+{
+  "$schema": "https://smapi.io/schemas/i18n.json",
+  "config.Enable_BobberBarFishIcon.name": "启用：浮标鱼图标",
+  "config.Enable_BobberBarFishIcon.desc": "将钓鱼游戏中的鱼图标替换为真正的鱼图标。",
+  "config.UncaughtFishSilhouette.name": "未捕获的鱼显示为剪影",
+  "config.UncaughtFishSilhouette.desc": "在你钓到鱼之前，鱼会显示为剪影。",
+  "config.Enable_GuarenteedSpecificBait.name": "启用：针对性鱼饵强化",
+  "config.Enable_GuarenteedSpecificBait.desc": "在季节和条件匹配的情况下，针对性鱼饵必定生效。无视天气时间和捕捉数限制。"
+}

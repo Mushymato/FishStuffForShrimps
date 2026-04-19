@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using FishStuffForShrimps.Features;
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -26,8 +27,8 @@ public sealed partial class ModEntry : Mod
 
         helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 
-        BobblerBarFishIcon_Toggle();
-        GuarenteedSpecificBait_Toggle();
+        BobberBarFishIcon.Toggle();
+        GuarenteedSpecificBait.Toggle();
     }
 
     private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)

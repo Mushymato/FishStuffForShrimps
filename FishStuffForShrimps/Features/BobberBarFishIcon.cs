@@ -8,42 +8,45 @@ using StardewValley;
 using StardewValley.ItemTypeDefinitions;
 using StardewValley.Menus;
 
-namespace FishStuffForShrimps;
+namespace FishStuffForShrimps.Features;
 
-public sealed partial class ModEntry : Mod
+public static class BobberBarFishIcon
 {
-    private static MethodInfo BobberBar_draw = AccessTools.DeclaredMethod(typeof(BobberBar), nameof(BobberBar.draw));
+    private static readonly MethodInfo BobberBar_draw = AccessTools.DeclaredMethod(
+        typeof(BobberBar),
+        nameof(BobberBar.draw)
+    );
 
-    public static void BobblerBarFishIcon_Toggle()
+    public static void Toggle()
     {
-        if (!config.Enable_BobberBarFishIcon)
+        if (!ModEntry.config.Enable_BobberBarFishIcon)
         {
-            BobblerBarFishIcon_Unpatch();
+            Unpatch();
             return;
         }
-        BobblerBarFishIcon_Patch();
+        Patch();
     }
 
-    private static void BobblerBarFishIcon_Patch()
+    private static void Patch()
     {
-        Log("BobberBarFishIcon: Enabled", LogLevel.Info);
+        ModEntry.Log($"{nameof(BobberBarFishIcon)}: Enabled", LogLevel.Info);
         try
         {
-            harmony.Patch(
+            ModEntry.harmony.Patch(
                 original: BobberBar_draw,
-                transpiler: new HarmonyMethod(typeof(ModEntry), nameof(BobberBar_draw_Transpiler))
+                transpiler: new HarmonyMethod(typeof(BobberBarFishIcon), nameof(BobberBar_draw_Transpiler))
             );
         }
         catch (Exception err)
         {
-            Log($"Failed to patch BobblerBarFishIcon:\n{err}", LogLevel.Error);
+            ModEntry.Log($"Failed to patch BobblerBarFishIcon:\n{err}", LogLevel.Error);
         }
     }
 
-    private static void BobblerBarFishIcon_Unpatch()
+    private static void Unpatch()
     {
-        Log("BobberBarFishIcon: Disabled", LogLevel.Info);
-        harmony.Unpatch(BobberBar_draw, HarmonyPatchType.Transpiler, ModId);
+        ModEntry.Log($"{nameof(BobberBarFishIcon)}: Disabled", LogLevel.Info);
+        ModEntry.harmony.Unpatch(BobberBar_draw, HarmonyPatchType.Transpiler, ModEntry.ModId);
     }
 
     private static IEnumerable<CodeInstruction> BobberBar_draw_Transpiler(
@@ -85,7 +88,7 @@ public sealed partial class ModEntry : Mod
                 ])
                 .ThrowIfNotMatch("Failed to match 'sparkleText?.draw'");
             matcher.Opcode = OpCodes.Call;
-            matcher.Operand = AccessTools.DeclaredMethod(typeof(ModEntry), nameof(BobberBar_draw_Replace));
+            matcher.Operand = AccessTools.DeclaredMethod(typeof(BobberBarFishIcon), nameof(BobberBar_draw_Replace));
             matcher.Insert([
                 new(OpCodes.Ldarg_0),
                 new(OpCodes.Ldfld, AccessTools.DeclaredField(typeof(BobberBar), "fishObject")),
@@ -95,7 +98,7 @@ public sealed partial class ModEntry : Mod
         }
         catch (Exception err)
         {
-            Log($"Error in BobberBar_draw_Transpiler:\n{err}", LogLevel.Error);
+            ModEntry.Log($"Error in BobberBar_draw_Transpiler:\n{err}", LogLevel.Error);
             return instructions;
         }
     }
@@ -117,7 +120,8 @@ public sealed partial class ModEntry : Mod
         ParsedItemData parsedItemData = ItemRegistry.GetDataOrErrorItem(fishObject.QualifiedItemId);
         Rectangle newSourceRect = parsedItemData.GetSourceRect();
         Color newColor =
-            !config.UncaughtFishSilhouette || Game1.player.fishCaught.ContainsKey(parsedItemData.QualifiedItemId)
+            !ModEntry.config.UncaughtFishSilhouette
+            || Game1.player.fishCaught.ContainsKey(parsedItemData.QualifiedItemId)
                 ? color
                 : Color.Black * 0.7f;
         b.Draw(
