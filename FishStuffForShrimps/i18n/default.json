@@ -6,6 +6,6 @@
   "config.UncaughtFishSilhouette.desc": "Until you catch the fish, the fish will be shown as silhouette.",
   "config.Enable_GuarenteedSpecificBait.name": "Enable: Guarenteed Targeted Bait",
   "config.Enable_GuarenteedSpecificBait.desc": "Make the targeted bait always get the targeted fish if the season and conditions match, while ignoring weather, time, and catch limits.",
-  "config.Enable_OnlyFishConsumesBait.name": "Enable: Only Fish Consumes Bait",
-  "config.Enable_OnlyFishConsumesBait.desc": "Only "
+  "config.Enable_OnlyFishConsumesBaitAndTackle.name": "Enable: Only Fish Consumes Bait and Tackle",
+  "config.Enable_OnlyFishConsumesBaitAndTackle.desc": "Bait and tackle are only used up when catching a fish."
 }

@@ -9,14 +9,14 @@ public sealed class ModConfig
     public bool Enable_BobberBarFishIcon { get; set; } = true;
     public bool UncaughtFishSilhouette { get; set; } = true;
     public bool Enable_GuarenteedSpecificBait { get; set; } = true;
-    public bool Enable_OnlyFishConsumesBait { get; set; } = true;
+    public bool Enable_OnlyFishConsumesBaitAndTackle { get; set; } = true;
 
     public void Reset()
     {
         Enable_BobberBarFishIcon = true;
         UncaughtFishSilhouette = true;
         Enable_GuarenteedSpecificBait = true;
-        Enable_OnlyFishConsumesBait = true;
+        Enable_OnlyFishConsumesBaitAndTackle = true;
     }
 
     public void Register(IModHelper helper, IManifest mod)
@@ -64,16 +64,16 @@ public sealed class ModConfig
         );
         gmcm.AddBoolOption(
             mod,
-            () => Enable_OnlyFishConsumesBait,
+            () => Enable_OnlyFishConsumesBaitAndTackle,
             (value) =>
             {
-                bool checkBefore = Enable_OnlyFishConsumesBait;
-                Enable_OnlyFishConsumesBait = value;
-                if (checkBefore != Enable_OnlyFishConsumesBait)
-                    OnlyFishConsumesBait.Toggle();
+                bool checkBefore = Enable_OnlyFishConsumesBaitAndTackle;
+                Enable_OnlyFishConsumesBaitAndTackle = value;
+                if (checkBefore != Enable_OnlyFishConsumesBaitAndTackle)
+                    OnlyFishConsumesBaitAndTackle.Toggle();
             },
-            I18n.Config_EnableOnlyFishConsumesBait_Name,
-            I18n.Config_EnableOnlyFishConsumesBait_Desc
+            I18n.Config_EnableOnlyFishConsumesBaitAndTackle_Name,
+            I18n.Config_EnableOnlyFishConsumesBaitAndTackle_Desc
         );
     }
 }

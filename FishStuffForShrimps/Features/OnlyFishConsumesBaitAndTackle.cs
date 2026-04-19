@@ -4,7 +4,7 @@ using StardewValley.Tools;
 
 namespace FishStuffForShrimps.Features;
 
-public static class OnlyFishConsumesBait
+public static class OnlyFishConsumesBaitAndTackle
 {
     private static readonly MethodInfo FishingRod_doneFishing = AccessTools.DeclaredMethod(
         typeof(FishingRod),
@@ -13,7 +13,7 @@ public static class OnlyFishConsumesBait
 
     public static void Toggle()
     {
-        if (!ModEntry.config.Enable_OnlyFishConsumesBait)
+        if (!ModEntry.config.Enable_OnlyFishConsumesBaitAndTackle)
         {
             Unpatch();
             return;
@@ -25,7 +25,7 @@ public static class OnlyFishConsumesBait
     {
         ModEntry.harmony.Patch(
             original: FishingRod_doneFishing,
-            prefix: new HarmonyMethod(typeof(OnlyFishConsumesBait), nameof(FishingRod_doneFishing_Prefix))
+            prefix: new HarmonyMethod(typeof(OnlyFishConsumesBaitAndTackle), nameof(FishingRod_doneFishing_Prefix))
         );
     }
 
@@ -38,12 +38,7 @@ public static class OnlyFishConsumesBait
     {
         if (!consumeBaitAndTackle)
             return;
-        if (
-            __instance.whichFish == null
-            || __instance.lastCatchWasJunk
-            || __instance.fromFishPond
-            || __instance.Category != StardewValley.Object.FishCategory
-        )
+        if (__instance.whichFish == null || __instance.lastCatchWasJunk || __instance.fromFishPond)
             consumeBaitAndTackle = false;
     }
 }

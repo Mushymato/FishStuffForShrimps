@@ -29,7 +29,7 @@ public sealed partial class ModEntry : Mod
 
         BobberBarFishIcon.Toggle();
         GuarenteedSpecificBait.Toggle();
-        OnlyFishConsumesBait.Toggle();
+        OnlyFishConsumesBaitAndTackle.Toggle();
     }
 
     private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
