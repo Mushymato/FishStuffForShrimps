@@ -36,13 +36,15 @@ public sealed class ModConfig
                 if (shouldToggle)
                     ModEntry.BobblerBarFishIcon_Toggle();
             },
-            I18n.Config_EnableBobberBarFishIcon
+            I18n.Config_EnableBobberBarFishIcon_Name,
+            I18n.Config_EnableBobberBarFishIcon_Desc
         );
         gmcm.AddBoolOption(
             mod,
             () => UncaughtFishSilhouette,
             (value) => UncaughtFishSilhouette = value,
-            I18n.Config_UncaughtFishSilhouette
+            I18n.Config_UncaughtFishSilhouette_Name,
+            I18n.Config_UncaughtFishSilhouette_Desc
         );
         gmcm.AddBoolOption(
             mod,
@@ -54,7 +56,8 @@ public sealed class ModConfig
                 if (shouldToggle)
                     ModEntry.GuarenteedSpecificBait_Toggle();
             },
-            I18n.Config_EnableGuarenteedSpecificBait
+            I18n.Config_EnableGuarenteedSpecificBait_Name,
+            I18n.Config_EnableGuarenteedSpecificBait_Desc
         );
     }
 }

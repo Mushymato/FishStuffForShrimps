@@ -251,7 +251,6 @@ public sealed partial class ModEntry
         Log($"Failed to get '{targetedFish}'");
         return;
 
-
         string formatItemId(string query) =>
             query
                 .Replace("BOBBER_X", ((int)bobberTile.X).ToString())

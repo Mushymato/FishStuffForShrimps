@@ -1,6 +1,9 @@
 {
   "$schema": "https://smapi.io/schemas/i18n.json",
-  "config.Enable_BobberBarFishIcon": "Enable: Bobber Bar Fish Icon",
-  "config.UncaughtFishSilhouette": "Show Silhouette for Uncaught Fish",
-  "config.Enable_GuarenteedSpecificBait": "Guarenteed Specific Bait"
+  "config.Enable_BobberBarFishIcon.name": "Enable: Bobber Bar Fish Icon",
+  "config.Enable_BobberBarFishIcon.desc": "Replace the fish icon in the minigame with the real fish icon.",
+  "config.UncaughtFishSilhouette.name": "Show Silhouette for Uncaught Fish",
+  "config.UncaughtFishSilhouette.desc": "Until you catch the fish, the fish will be shown as silhouette.",
+  "config.Enable_GuarenteedSpecificBait.name": "Enable: Guarenteed Specific Bait",
+  "config.Enable_GuarenteedSpecificBait.desc": "Make the specific bait always get the targeted fish if the season and conditions match, while ignoring weather, time, and spawn limits."
 }
