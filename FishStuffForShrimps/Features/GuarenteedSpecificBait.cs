@@ -289,10 +289,10 @@ public static class GuarenteedSpecificBait
                         __result.SetFlagOnPickup = spawn.SetFlagOnCatch;
                     if (spawn.IsBossFish)
                         __result.SetTempData("IsBossFish", value: true);
-                    return false;
+                    return true;
                 }
             }
-            return true;
+            return false;
         }
     }
 }
