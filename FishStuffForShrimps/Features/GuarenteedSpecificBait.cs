@@ -26,10 +26,6 @@ public static class GuarenteedSpecificBait
             typeof(ItemQueryContext),
         ]
     );
-    private static MethodInfo SpawnFishData_GetChance = AccessTools.DeclaredMethod(
-        typeof(SpawnFishData),
-        nameof(SpawnFishData.GetChance)
-    );
 
     public static void Toggle()
     {
@@ -57,10 +53,6 @@ public static class GuarenteedSpecificBait
                     nameof(GameLocation_GetFishFromLocationData_Postfix)
                 )
             );
-            ModEntry.harmony.Patch(
-                original: SpawnFishData_GetChance,
-                postfix: new HarmonyMethod(typeof(GuarenteedSpecificBait), nameof(SpawnFishData_GetChance_Postfix))
-            );
         }
         catch (Exception err)
         {
@@ -73,13 +65,6 @@ public static class GuarenteedSpecificBait
         ModEntry.Log($"{nameof(GuarenteedSpecificBait)}: Disabled", LogLevel.Info);
         ModEntry.harmony.Unpatch(GameLocation_GetFishFromLocationData, HarmonyPatchType.Transpiler, ModEntry.ModId);
         ModEntry.harmony.Unpatch(GameLocation_GetFishFromLocationData, HarmonyPatchType.Postfix, ModEntry.ModId);
-        ModEntry.harmony.Unpatch(SpawnFishData_GetChance, HarmonyPatchType.Postfix, ModEntry.ModId);
-    }
-
-    private static void SpawnFishData_GetChance_Postfix(bool isTargetedWithBait, ref float __result)
-    {
-        if (isTargetedWithBait)
-            __result = 1f;
     }
 
     private static IEnumerable<CodeInstruction> GameLocation_GetFishFromLocationData_Transpiler(
