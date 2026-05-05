@@ -1,5 +1,6 @@
 using System.Reflection;
 using HarmonyLib;
+using StardewModdingAPI;
 using StardewValley.Tools;
 
 namespace FishStuffForShrimps.Features;
@@ -23,6 +24,7 @@ public static class OnlyFishConsumesBaitAndTackle
 
     private static void Patch()
     {
+        ModEntry.Log($"{nameof(OnlyFishConsumesBaitAndTackle)}: Enabled", LogLevel.Info);
         ModEntry.harmony.Patch(
             original: FishingRod_doneFishing,
             prefix: new HarmonyMethod(typeof(OnlyFishConsumesBaitAndTackle), nameof(FishingRod_doneFishing_Prefix))
@@ -31,6 +33,7 @@ public static class OnlyFishConsumesBaitAndTackle
 
     private static void Unpatch()
     {
+        ModEntry.Log($"{nameof(OnlyFishConsumesBaitAndTackle)}: Disabled", LogLevel.Info);
         ModEntry.harmony.Unpatch(FishingRod_doneFishing, HarmonyPatchType.Prefix, ModEntry.ModId);
     }
 
