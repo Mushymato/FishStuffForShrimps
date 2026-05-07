@@ -219,6 +219,14 @@ public static class GuarenteedSpecificBait
                 continue;
             if (spawn.Condition != null && !GameStateQuery.CheckConditions(spawn.Condition))
                 continue;
+            if (
+                !ModEntry.config.BypassCatchLimit
+                && spawn.CatchLimit > -1
+                && player.fishCaught.TryGetValue(targetedFish, out int[] value)
+                && value[0] >= spawn.CatchLimit
+            )
+                continue;
+
             ModEntry.Log($"Trying '{spawn.Id}'");
             if (spawn.RandomItemId?.Any() ?? false)
             {

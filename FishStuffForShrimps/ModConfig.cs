@@ -8,14 +8,18 @@ public sealed class ModConfig
 {
     public bool Enable_BobberBarFishIcon { get; set; } = true;
     public bool UncaughtFishSilhouette { get; set; } = true;
+    public bool RequireSonarBobber { get; set; } = false;
     public bool Enable_GuarenteedSpecificBait { get; set; } = true;
+    public bool BypassCatchLimit { get; set; } = true;
     public bool Enable_OnlyFishConsumesBaitAndTackle { get; set; } = true;
 
     public void Reset()
     {
         Enable_BobberBarFishIcon = true;
         UncaughtFishSilhouette = true;
+        RequireSonarBobber = false;
         Enable_GuarenteedSpecificBait = true;
+        BypassCatchLimit = true;
         Enable_OnlyFishConsumesBaitAndTackle = true;
     }
 
@@ -51,6 +55,13 @@ public sealed class ModConfig
         );
         gmcm.AddBoolOption(
             mod,
+            () => RequireSonarBobber,
+            (value) => RequireSonarBobber = value,
+            I18n.Config_RequireSonarBobber_Name,
+            I18n.Config_RequireSonarBobber_Desc
+        );
+        gmcm.AddBoolOption(
+            mod,
             () => Enable_GuarenteedSpecificBait,
             (value) =>
             {
@@ -61,6 +72,13 @@ public sealed class ModConfig
             },
             I18n.Config_EnableGuarenteedSpecificBait_Name,
             I18n.Config_EnableGuarenteedSpecificBait_Desc
+        );
+        gmcm.AddBoolOption(
+            mod,
+            () => BypassCatchLimit,
+            (value) => BypassCatchLimit = value,
+            I18n.Config_BypassCatchLimit_Name,
+            I18n.Config_BypassCatchLimit_Desc
         );
         gmcm.AddBoolOption(
             mod,

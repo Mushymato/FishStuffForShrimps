@@ -18,8 +18,8 @@
     <Authors>mushymato</Authors>
     <Description>Fish QoL</Description>
     <UniqueId>mushymato.FishStuffForShrimps</UniqueId>
-    <UpdateKeys>GitHub:Mushymato/FishStuffForShrimps</UpdateKeys>
-    <Version>0.4.2</Version>
+    <UpdateKeys>Nexus:45149,GitHub:Mushymato/FishStuffForShrimps</UpdateKeys>
+    <Version>0.5.0</Version>
     <BaseManifest>new</BaseManifest>
     <MinimumApiVersion_Behavior>Update</MinimumApiVersion_Behavior>
     <MinimumGameVersion_Behavior>UpdateFull</MinimumGameVersion_Behavior>

@@ -92,6 +92,8 @@ public static class BobberBarFishIcon
             matcher.Insert([
                 new(OpCodes.Ldarg_0),
                 new(OpCodes.Ldfld, AccessTools.DeclaredField(typeof(BobberBar), "fishObject")),
+                new(OpCodes.Ldarg_0),
+                new(OpCodes.Ldfld, AccessTools.DeclaredField(typeof(BobberBar), "bobbers")),
             ]);
 
             return matcher.Instructions();
@@ -114,16 +116,23 @@ public static class BobberBarFishIcon
         float scale,
         SpriteEffects effects,
         float layerDepth,
-        Item fishObject
+        Item fishObject,
+        List<string> bobbers
     )
     {
         ParsedItemData parsedItemData = ItemRegistry.GetDataOrErrorItem(fishObject.QualifiedItemId);
         Rectangle newSourceRect = parsedItemData.GetSourceRect();
-        Color newColor =
-            !ModEntry.config.UncaughtFishSilhouette
-            || Game1.player.fishCaught.ContainsKey(parsedItemData.QualifiedItemId)
-                ? color
-                : Color.Black * 0.7f;
+        Color newColor = color;
+        if (
+            (
+                ModEntry.config.UncaughtFishSilhouette
+                && !Game1.player.fishCaught.ContainsKey(parsedItemData.QualifiedItemId)
+            )
+            || ModEntry.config.RequireSonarBobber && !bobbers.Contains("(O)SonarBobber")
+        )
+        {
+            newColor = Color.Black * 0.7f;
+        }
         b.Draw(
             parsedItemData.GetTexture(),
             destination,

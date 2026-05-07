@@ -3,9 +3,13 @@
   "config.Enable_BobberBarFishIcon.name": "启用：浮标鱼图标",
   "config.Enable_BobberBarFishIcon.desc": "将钓鱼游戏中的鱼图标替换为真正的鱼图标。",
   "config.UncaughtFishSilhouette.name": "浮标鱼图标：未捕获的鱼显示为剪影",
-  "config.UncaughtFishSilhouette.desc": "在你钓到鱼之前，鱼会显示为剪影。",
+  "config.UncaughtFishSilhouette.desc": "如果你没有钓到过这种鱼，浮标鱼显示为剪影。",
+  "config.RequireSonarBobber.name": "浮标鱼图标：要求声纳浮漂",
+  "config.RequireSonarBobber.desc": "如果你没有使用声纳浮漂，浮标鱼显示为剪影。",
   "config.Enable_GuarenteedSpecificBait.name": "启用：针对性鱼饵强化",
-  "config.Enable_GuarenteedSpecificBait.desc": "在季节和条件匹配的情况下，针对性鱼饵必定生效。无视天气时间和捕捉数限制。",
-  "config.Enable_OnlyFishConsumesBait.name": "Enable: Only Fish Consumes Bait",
-  "config.Enable_OnlyFishConsumesBait.desc": "Bait and tackles are only used when catching a fish."
+  "config.Enable_GuarenteedSpecificBait.desc": "在季节和条件匹配的情况下，针对性鱼饵必定生效。无视天气时间和。",
+  "config.BypassCatchLimit.name": "针对性鱼饵强化：无视捕捉数限制",
+  "config.BypassCatchLimit.desc": "针对性鱼饵将无视无视捕捉数限制，允许用对应的鱼饵钓出多条传说鱼类。",
+  "config.Enable_OnlyFishConsumesBait.name": "启用：非鱼不消耗鱼饵和渔具",
+  "config.Enable_OnlyFishConsumesBait.desc": "鱼饵和渔具只有钓起鱼时才会消耗。"
 }
