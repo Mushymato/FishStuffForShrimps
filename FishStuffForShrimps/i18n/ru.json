@@ -1,0 +1,18 @@
+{
+  "$schema": "https://smapi.io/schemas/i18n.json",
+  "config.Enable_BobberBarFishIcon.name": "Включить: иконка рыбы на шкале поплавка",
+  "config.Enable_BobberBarFishIcon.desc": "Заменяет иконку рыбы в мини-игре на настоящую иконку рыбы.",
+  "config.UncaughtFishSilhouette.name": "- Показывать силуэт для не пойманной рыбы",
+  "config.UncaughtFishSilhouette.desc": "Если вы ещё не ловили эту рыбу, она будет показана в виде силуэта.",
+  "config.RequireSonarBobber.name": "- Требовать сонарный поплавок",
+  "config.RequireSonarBobber.desc": "Если вы не используете сонарный поплавок, рыба будет показана в виде силуэта.",
+  "config.Enable_GuarenteedSpecificBait.name": "Включить: гарантированная Целевая наживка",
+  "config.Enable_GuarenteedSpecificBait.desc": "Целевая наживка всегда будет ловить целевую рыбу, если сезон и условия совпадают, игнорируя погоду и время.",
+  "config.BypassCatchLimit.name": "- Игнорировать лимит вылова",
+  "config.BypassCatchLimit.desc": "Целевая наживка будет игнорировать лимиты вылова, позволяя поймать несколько легендарных рыб с соответствующей наживкой.",
+  "config.Enable_OnlyFishConsumesBaitAndTackle.name": "Включить: только рыба расходует приманку и снасти",
+  "config.Enable_OnlyFishConsumesBaitAndTackle.desc": "Наживка и снасти расходуются только при поимке рыбы.",
+  "config.Enable_FishingDoesNotStopTime.name": "Включить: время не останавливается во время рыбалки",
+  "config.Enable_FishingDoesNotStopTime.desc": "Время продолжает идти во время мини-игры рыбалки в одиночной игре.",
+  "compat.ItsStardewTimeWarning": "ItsStardewTime несовместим с функцией остановки времени во время рыбалки в моде Fish Stuff For Shrimps."
+}
